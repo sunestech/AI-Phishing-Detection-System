@@ -1,0 +1,15 @@
+{
+  "accuracy": 0.997,
+  "precision_phishing": 0.9986622073578595,
+  "recall_phishing": 0.9953333333333333,
+  "f1_phishing": 0.9969949916527546,
+  "roc_auc": 0.9989746666666667,
+  "threshold": 0.5,
+  "training_rows": 14000,
+  "validation_rows": 3000,
+  "test_rows": 3000,
+  "vocabulary_size": 60,
+  "max_length": 200,
+  "epochs_completed": 12,
+  "device": "cpu"
+}

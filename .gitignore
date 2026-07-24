@@ -1,0 +1,57 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# IDE and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+secrets.*
+
+# Logs
+*.log
+
+# Generated model binaries
+*.pkl
+*.joblib
+*.pt
+*.pth
+*.h5
+*.keras
+*.onnx
+
+# Project datasets
+part1-random-forest/phishing*.csv
+part1-random-forest/data/
+part2-lstm/data/
+part2-lstm/raw_urls.csv
+
+# Large or redistributable prediction exports
+part2-lstm/reports/test_predictions.csv
+
+# Temporary archives and backups
+*.zip
+*.7z
+*.tar
+*.gz
+*.bak
+*~

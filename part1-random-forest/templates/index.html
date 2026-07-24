@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Phishing Detection — Part 1 Verifier</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, Arial, sans-serif;
+    }
+    body {
+      margin: 0;
+      background: #0d1117;
+      color: #e6edf3;
+    }
+    main {
+      width: min(920px, calc(100% - 32px));
+      margin: 42px auto;
+    }
+    .panel {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 18px;
+    }
+    h1, h2 { margin-top: 0; }
+    .muted { color: #8b949e; line-height: 1.55; }
+    .notice {
+      border-left: 4px solid #d29922;
+      background: #211d13;
+      padding: 12px 14px;
+      border-radius: 6px;
+      line-height: 1.5;
+    }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .metric {
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 14px;
+      background: #0d1117;
+    }
+    .metric strong { display: block; font-size: 1.25rem; margin-top: 6px; }
+    form {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: end;
+    }
+    label { display: block; font-weight: 700; margin-bottom: 7px; }
+    select {
+      min-width: 230px;
+      padding: 11px;
+      border-radius: 6px;
+      border: 1px solid #30363d;
+      background: #0d1117;
+      color: #e6edf3;
+    }
+    button {
+      padding: 11px 18px;
+      border: 0;
+      border-radius: 6px;
+      background: #238636;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button:hover { background: #2ea043; }
+    .success { border-left: 5px solid #3fb950; }
+    .failure { border-left: 5px solid #f85149; }
+    .error { border-left: 5px solid #f85149; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td {
+      text-align: left;
+      padding: 10px;
+      border-bottom: 1px solid #30363d;
+    }
+    th { color: #8b949e; }
+    code { color: #79c0ff; }
+  </style>
+</head>
+<body>
+<main>
+  <section class="panel">
+    <h1>AI-Based Phishing Detection — Part 1</h1>
+    <p class="muted">
+      This page verifies the saved Random Forest using records from the held-out
+      20% test set—the records that were not used to train the model.
+    </p>
+    <div class="notice">
+      <strong>Why there is no URL text box:</strong>
+      this Part 1 model expects {{ feature_count }} already-engineered numeric
+      features. Raw URL classification belongs to the character-level LSTM in Part 2.
+    </div>
+    <div class="summary">
+      <div class="metric">
+        Features
+        <strong>{{ feature_count }}</strong>
+      </div>
+      <div class="metric">
+        Held-out records
+        <strong>{{ holdout_count }}</strong>
+      </div>
+      <div class="metric">
+        Saved test accuracy
+        <strong>
+          {% if accuracy is not none %}
+            {{ '%.2f'|format(accuracy * 100) }}%
+          {% else %}
+            See reports
+          {% endif %}
+        </strong>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Run one holdout prediction</h2>
+    <form method="post">
+      <div>
+        <label for="sample_id">Website record ID</label>
+        <select id="sample_id" name="sample_id">
+          {% for sample_id in sample_options %}
+            <option value="{{ sample_id }}" {% if sample_id == selected_id %}selected{% endif %}>
+              Record {{ sample_id }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit">Run prediction</button>
+    </form>
+  </section>
+
+  {% if error %}
+    <section class="panel error">
+      <h2>Could not run prediction</h2>
+      <p>{{ error }}</p>
+    </section>
+  {% endif %}
+
+  {% if result %}
+    <section class="panel {{ 'success' if result.correct else 'failure' }}">
+      <h2>{{ 'Correct prediction' if result.correct else 'Incorrect prediction' }}</h2>
+      <table>
+        <tr><th>Record ID</th><td>{{ result.record_id }}</td></tr>
+        <tr><th>Actual class</th><td>{{ result.actual_text }} ({{ result.actual_number }})</td></tr>
+        <tr><th>Predicted class</th><td>{{ result.predicted_text }} ({{ result.predicted_number }})</td></tr>
+        <tr>
+          <th>Phishing probability</th>
+          <td>
+            {% if result.probability is not none %}
+              {{ '%.2f'|format(result.probability * 100) }}%
+            {% else %}
+              Not available
+            {% endif %}
+          </td>
+        </tr>
+      </table>
+    </section>
+
+    <section class="panel">
+      <h2>Values of the ten most influential features</h2>
+      <p class="muted">
+        These are the strongest model-wide features, not a claim that one feature alone
+        caused this particular prediction.
+      </p>
+      <table>
+        <thead><tr><th>Feature</th><th>Value for this record</th></tr></thead>
+        <tbody>
+          {% for feature in result.features %}
+            <tr><td><code>{{ feature.name }}</code></td><td>{{ feature.value }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+  {% endif %}
+</main>
+</body>
+</html>

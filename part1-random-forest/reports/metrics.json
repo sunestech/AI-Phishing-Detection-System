@@ -1,0 +1,17 @@
+{
+  "best_parameters": {
+    "max_depth": 20,
+    "min_samples_leaf": 1,
+    "min_samples_split": 2,
+    "n_estimators": 300
+  },
+  "cross_validation_accuracy": 0.9821250000000001,
+  "test_accuracy": 0.9865,
+  "phishing_precision": 0.9879638916750251,
+  "phishing_recall": 0.985,
+  "phishing_f1_score": 0.9864797195793691,
+  "roc_auc": 0.9990495,
+  "training_rows": 8000,
+  "test_rows": 2000,
+  "feature_count": 48
+}
